@@ -1,0 +1,162 @@
+Project Name: Internship Certificate Manager
+
+
+---
+
+⚙ 1. FEATURES
+
+🔐 Admin Side:
+
+Secure login & logout with hashed passwords
+
+Upload Excel (.xlsx) files (student name, email, college)
+
+Auto-generate personalized PDF certificates using a template
+
+Auto-send emails with attached certificates
+
+Dashboard: Track sent/pending certificates
+
+Re-send certificate option
+
+View all student records
+
+Search and filter records
+
+Responsive design with Bootstrap/Tailwind
+
+
+🎓 Student Side:
+
+Certificate authenticity checker using unique Certificate ID
+
+Public certificate view page (optional)
+
+
+
+---
+
+🛠 2. TECH STACK
+
+Layer	Tech Used
+
+Frontend	HTML5, CSS3, Bootstrap/Tailwind, JS
+Backend	Python (Flask)
+PDF Generator	ReportLab / WeasyPrint / FPDF
+Email Sending	Flask-Mail / SMTP
+Database	SQLite / PostgreSQL
+Excel Handling	pandas / openpyxl
+Authentication	Flask-Login, Flask-WTF
+
+5. requirements.txt
+
+Flask
+Flask-Login
+Flask-Mail
+Flask-Migrate
+Flask-WTF
+Flask-SQLAlchemy
+python-dotenv
+openpyxl
+pandas
+reportlab
+email-validator
+
+
+---
+
+🔐 6. Admin Authentication
+
+Use Flask-Login and store credentials in hashed format with Werkzeug.
+
+Only authenticated admin can access /dashboard, /upload, /resend.
+
+
+
+---
+
+🧾 7. PDF Certificate Generator (pdf_generator.py)
+
+Use ReportLab or FPDF to render name, date, certificate ID on a background template.
+
+Save certificates as certificates/{cert_id}.pdf.
+
+
+
+---
+
+📧 8. Email Sending (email_utils.py)
+
+Use Flask-Mail for sending emails.
+
+Attach personalized PDF certificate.
+
+Log sent status to DB.
+
+
+
+---
+
+📥 9. Excel Upload (routes.py)
+
+Admin uploads .xlsx
+
+Use pandas + openpyxl to extract rows
+
+Auto-create records in DB, generate certs, send emails
+
+
+
+---
+
+🧾 10. Certificate Verification (/verify route)
+
+Public form where user enters cert ID
+
+Query DB and show cert details if found
+
+(Optional) show PDF in browser
+
+
+
+---
+
+🔐 11. Security Features
+
+Password hashing (never store plain passwords)
+
+Use HTTPS in production
+
+Sanitize Excel uploads
+
+Rate-limiting (if needed)
+
+Secure token/ID for cert links
+
+
+
+---
+
+🎨 12. UI/UX Enhancements
+
+Responsive layout with Bootstrap 5 / Tailwind
+
+Use modals for resend confirmation
+
+Display charts for stats (e.g., Chart.js)
+
+
+
+---
+
+✅ 13. Advanced Suggestions
+
+Add QR Code on certificate for scan & verify
+
+Add admin analytics (certs/month)
+
+Export student data back to Excel
+
+Bulk re-send failed emails
+
+OTP-based student-side certificate access

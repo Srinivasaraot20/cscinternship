@@ -1,0 +1,430 @@
+/* Custom CSS for Certificate Manager */
+
+/* Override Bootstrap variables for consistent theming */
+:root {
+    --primary-color: #4CAF50;
+    --secondary-color: #2196F3;
+    --success-color: #8BC34A;
+    --warning-color: #FF9800;
+    --danger-color: #F44336;
+    --info-color: #00BCD4;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+}
+
+/* Body and general styling */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+}
+
+/* Custom card hover effects */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Certificate verification badge styling */
+.verification-badge {
+    display: inline-block;
+    padding: 1rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4CAF50, #8BC34A);
+    color: white;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Status badges */
+.badge {
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+}
+
+/* Custom button styles */
+.btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), #66BB6A);
+    border: none;
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #45a049, var(--primary-color));
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Navigation bar styling */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+/* Dashboard statistics cards */
+.stats-card {
+    background: linear-gradient(135deg, var(--primary-color), #66BB6A);
+    color: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stats-card .stats-icon {
+    font-size: 2.5rem;
+    opacity: 0.8;
+}
+
+.stats-card .stats-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+.stats-card .stats-label {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Table styling */
+.table {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    border-top: none;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+/* Form styling */
+.form-control {
+    border-radius: 0.375rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da, #f1b0b7);
+    color: #721c24;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    color: #856404;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+    color: #0c5460;
+}
+
+/* Certificate display styling */
+.certificate-container {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin: 1rem 0;
+}
+
+.certificate-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.certificate-body {
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.certificate-signature {
+    margin-top: 2rem;
+    text-align: right;
+}
+
+/* QR Code styling */
+.qr-code-container {
+    text-align: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.qr-code-container img {
+    max-width: 150px;
+    height: auto;
+}
+
+/* Progress bar styling */
+.progress {
+    border-radius: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.progress-bar {
+    border-radius: 0.5rem;
+    background: linear-gradient(90deg, var(--primary-color), #66BB6A);
+}
+
+/* Modal styling */
+.modal-content {
+    border-radius: 0.5rem;
+    border: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Loading spinner */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* File upload area */
+.file-upload-area {
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.file-upload-area:hover {
+    border-color: var(--primary-color);
+}
+
+.file-upload-area.dragover {
+    border-color: var(--primary-color);
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+/* Pagination styling */
+.pagination .page-link {
+    border-radius: 0.375rem;
+    margin: 0 0.125rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--bs-body-color);
+}
+
+.pagination .page-link:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Accordion styling */
+.accordion-button {
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: var(--primary-color);
+}
+
+/* Search and filter styling */
+.search-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Certificate status indicators */
+.status-pending {
+    color: #FF9800;
+}
+
+.status-sent {
+    color: #4CAF50;
+}
+
+.status-failed {
+    color: #F44336;
+}
+
+.status-verified {
+    color: #2196F3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-group-vertical .btn {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Dark mode adjustments */
+[data-bs-theme="dark"] .certificate-container {
+    background: var(--bs-gray-800);
+    color: var(--bs-gray-100);
+}
+
+[data-bs-theme="dark"] .qr-code-container {
+    background: var(--bs-gray-800);
+}
+
+[data-bs-theme="dark"] .file-upload-area {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Animation classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Utility classes */
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary-color), #66BB6A);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+}
+
+.border-gradient {
+    border: 2px solid;
+    border-image: linear-gradient(135deg, var(--primary-color), #66BB6A) 1;
+}
+
+.shadow-soft {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-medium {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.shadow-strong {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Certificate verification result styling */
+.verification-result {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    margin: 1rem 0;
+    border-left: 4px solid var(--primary-color);
+}
+
+.verification-result.invalid {
+    background: linear-gradient(135deg, #f8d7da, #f1b0b7);
+    border-left-color: var(--danger-color);
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .footer,
+    .btn,
+    .pagination {
+        display: none !important;
+    }
+    
+    .certificate-container {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+}

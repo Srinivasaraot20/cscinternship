@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Certificate - Certificate Manager{% endblock %}
+
+{% block head %}
+<!-- Add jsQR library -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-5">
+                <i class="fas fa-shield-alt text-primary me-2"></i>Certificate Verification
+            </h1>
+            <p class="lead text-muted">Verify the authenticity of internship certificates</p>
+        </div>
+
+        {% if not verified %}
+            <!-- Verification Form -->
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-search me-2"></i>Enter Certificate ID
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        <div class="row">
+                            <div class="col-md-8">
+                                {{ form.certificate_id.label(class="form-label") }}
+                                {{ form.certificate_id(class="form-control form-control-lg", placeholder="Enter Certificate ID (e.g., CERT-20240115-A1B2)") }}
+                                {% if form.certificate_id.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.certificate_id.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    The Certificate ID can be found on your certificate document
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-grid">
+                                    {{ form.submit(class="btn btn-primary btn-lg") }}
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- QR Code Scanner -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-qrcode me-2"></i>QR Code Scanner
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <p class="text-muted">Scan the QR code from your certificate for instant verification</p>
+                    <button class="btn btn-outline-primary" onclick="startQRScanner()">
+                        <i class="fas fa-camera me-1"></i>Start QR Scanner
+                    </button>
+                    <div id="qr-scanner" class="mt-3" style="display: none;"></div>
+                </div>
+            </div>
+
+        {% else %}
+            <!-- Verification Result -->
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>Certificate Verified Successfully
+                        {% if qr_scan %}
+                            <span class="badge bg-light text-dark ms-2">QR Scan</span>
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="text-success mb-3">
+                                <i class="fas fa-award me-2"></i>Certificate Details
+                            </h5>
+
+                            <table class="table table-borderless">
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold">Student Name:</td>
+                                        <td>{{ student.student_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Roll Number:</td>
+                                        <td>{{ student.roll_number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Branch:</td>
+                                        <td>{{ student.branch }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">College:</td>
+                                        <td>{{ student.college_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Internship:</td>
+                                        <td>{{ student.internship_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Duration:</td>
+                                        <td>
+                                            {{ student.start_date.strftime('%d/%m/%Y') }} to 
+                                            {{ student.end_date.strftime('%d/%m/%Y') }}
+                                            <span class="badge bg-info">{{ student.duration_weeks }} weeks</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Certificate ID:</td>
+                                        <td><code>{{ student.certificate_id }}</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Issue Date:</td>
+                                        <td>{{ student.issue_date.strftime('%d/%m/%Y') }}</td>
+                                    </tr>
+                                    {% if student.mentor_name %}
+                                    <tr>
+                                        <td class="fw-bold">Mentor:</td>
+                                        <td>{{ student.mentor_name }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if student.performance_grade %}
+                                    <tr>
+                                        <td class="fw-bold">Grade:</td>
+                                        <td><span class="badge bg-success">{{ student.performance_grade }}</span></td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-md-4">
+                            <!-- Verification Badge -->
+                            <div class="text-center">
+                                <div class="verification-badge mb-3">
+                                    <i class="fas fa-certificate fa-5x text-success"></i>
+                                    <div class="mt-2">
+                                        <span class="badge bg-success fs-6">VERIFIED</span>
+                                    </div>
+                                </div>
+
+                                <!-- Verification Stats -->
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Verification Statistics</h6>
+                                        <p class="mb-1">
+                                            <i class="fas fa-eye me-1"></i>
+                                            Verified {{ student.verification_count }} times
+                                        </p>
+                                        {% if student.last_verified_at %}
+                                        <p class="mb-0 text-muted">
+                                            <small>Last verified: {{ student.last_verified_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                                        </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="mt-3">
+                                    {% if student.certificate_path %}
+                                    <a href="{{ url_for('download_certificate', certificate_id=student.certificate_id) }}" 
+                                       class="btn btn-outline-primary btn-sm mb-2" target="_blank">
+                                        <i class="fas fa-download me-1"></i>Download Certificate
+                                    </a>
+                                    {% endif %}
+
+                                    <button class="btn btn-outline-secondary btn-sm mb-2" onclick="shareCertificate()">
+                                        <i class="fas fa-share me-1"></i>Share Verification
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                This certificate has been verified as authentic and issued by 
+                                Andhra Pradesh State Council of Higher Education
+                            </small>
+                        </div>
+                        <div class="col-auto">
+                            <a href="{{ url_for('verify_certificate') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-search me-1"></i>Verify Another
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Information Section -->
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>How to Verify
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="list-group list-group-numbered">
+                            <li class="list-group-item border-0 ps-0">
+                                Look for the Certificate ID on your certificate document
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                Enter the Certificate ID in the form above
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                Click "Verify" to check authenticity
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                Alternatively, scan the QR code using our scanner
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-question-circle me-2"></i>Need Help?
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">If you're having trouble verifying your certificate:</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Ensure the Certificate ID is entered correctly
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Check for any extra spaces or special characters
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Try scanning the QR code instead
+                            </li>
+                            <li class="mb-0">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Contact support if the issue persists
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let video = null;
+let canvas = null;
+let canvasContext = null;
+let scanning = false;
+
+function startQRScanner() {
+    const scannerDiv = document.getElementById('qr-scanner');
+    scannerDiv.style.display = 'block';
+    
+    // Create video element
+    video = document.createElement('video');
+    video.setAttribute('playsinline', true);
+    video.setAttribute('autoplay', true);
+    
+    // Create canvas element
+    canvas = document.createElement('canvas');
+    canvasContext = canvas.getContext('2d');
+    
+    // Add elements to scanner div
+    scannerDiv.innerHTML = '';
+    scannerDiv.appendChild(video);
+    scannerDiv.appendChild(canvas);
+    
+    // Start scanning
+    scanning = true;
+    scanQRCode();
+    
+    // Request camera access
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(function(stream) {
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch(function(err) {
+            console.error('Error accessing camera:', err);
+            scannerDiv.innerHTML = '<div class="alert alert-danger">Error accessing camera. Please ensure you have granted camera permissions.</div>';
+        });
+}
+
+function scanQRCode() {
+    if (!scanning) return;
+    
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth;
+        canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        
+        if (code) {
+            // Stop scanning
+            scanning = false;
+            
+            // Process the QR code data
+            const qrData = code.data;
+            if (qrData.includes('/qr/')) {
+                const certificateId = qrData.split('/qr/')[1];
+                window.location.href = `/qr/${certificateId}`;
+            } else {
+                alert('Invalid QR code format. Please scan a valid certificate QR code.');
+                scanning = true;
+            }
+        }
+    }
+    
+    // Continue scanning
+    requestAnimationFrame(scanQRCode);
+}
+
+function stopQRScanner() {
+    scanning = false;
+    if (video && video.srcObject) {
+        const tracks = video.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+    }
+}
+
+function shareCertificate() {
+    const url = window.location.href;
+    const text = `Certificate verified for {{ student.student_name if student else 'this student' }} - {{ student.internship_name if student else 'Internship Program' }}`;
+
+    if (navigator.share) {
+        navigator.share({
+            title: 'Certificate Verification',
+            text: text,
+            url: url
+        });
+    } else {
+        // Fallback to clipboard
+        navigator.clipboard.writeText(`${text} - ${url}`).then(() => {
+            alert('Verification link copied to clipboard!');
+        });
+    }
+}
+
+// Auto-focus certificate ID input
+document.addEventListener('DOMContentLoaded', function() {
+    const certInput = document.getElementById('certificate_id');
+    if (certInput) {
+        certInput.focus();
+
+        // Auto-format certificate ID as user types
+        certInput.addEventListener('input', function(e) {
+            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+            e.target.value = value;
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,494 @@
+{% extends "base.html" %}
+
+{% block title %}Student Portal - Certificate Manager{% endblock %}
+
+{% block head %}
+<!-- Add jsQR library -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-5">
+                <i class="fas fa-graduation-cap text-primary me-2"></i>Student Portal
+            </h1>
+            <p class="lead text-muted">Access and manage your internship certificates</p>
+        </div>
+
+        <!-- Quick Access Cards -->
+        <div class="row mb-5">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Verify Certificate</h5>
+                        <p class="card-text">Check the authenticity of any internship certificate using Certificate ID or QR code scan.</p>
+                        <a href="{{ url_for('verify_certificate') }}" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>Verify Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-qrcode fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">QR Code Scanner</h5>
+                        <p class="card-text">Scan the QR code from your certificate for instant verification and details.</p>
+                        <button class="btn btn-success" onclick="startQRScanner()">
+                            <i class="fas fa-camera me-1"></i>Scan QR Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-download fa-3x text-info mb-3"></i>
+                        <h5 class="card-title">Download Certificate</h5>
+                        <p class="card-text">Access and download your certificate using your Certificate ID.</p>
+                        <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#downloadModal">
+                            <i class="fas fa-download me-1"></i>Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificate Lookup Form -->
+        <div class="card mb-5">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-certificate me-2"></i>Certificate Lookup
+                </h4>
+            </div>
+            <div class="card-body">
+                <form id="certificateLookupForm">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <label for="student_certificate_id" class="form-label">Enter Your Certificate ID</label>
+                            <input type="text" class="form-control form-control-lg" 
+                                   id="student_certificate_id" 
+                                   placeholder="e.g., CERT-20240115-A1B2"
+                                   required>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Your Certificate ID can be found on your certificate document or in the email you received
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-search me-1"></i>Find My Certificate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row mb-5">
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-star me-2"></i>What You Can Do
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Verify your certificate authenticity
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Download high-quality PDF certificates
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Share verification links on social media
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Track certificate verification history
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Access certificates anytime, anywhere
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-check text-success me-2"></i>
+                                QR code scanning for instant verification
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-shield-alt me-2"></i>Security & Authenticity
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">Your certificates are secured with advanced technology:</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-qrcode text-primary me-2"></i>
+                                Unique QR codes for instant verification
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-fingerprint text-primary me-2"></i>
+                                Digital signatures and watermarks
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-database text-primary me-2"></i>
+                                Blockchain-style verification records
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-lock text-primary me-2"></i>
+                                Tamper-proof certificate generation
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-history text-primary me-2"></i>
+                                Complete audit trail of all activities
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-question-circle me-2"></i>Frequently Asked Questions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                How do I find my Certificate ID?
+                            </button>
+                        </h2>
+                        <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Your Certificate ID is printed on your certificate document and was also sent to you via email. 
+                                It follows the format CERT-YYYYMMDD-XXXX (e.g., CERT-20240115-A1B2).
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                What if I lost my certificate email?
+                            </button>
+                        </h2>
+                        <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You can still access your certificate using the Certificate ID. If you don't have the ID, 
+                                contact your institution's administration office with your roll number and internship details.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                How do I verify a certificate for employers?
+                            </button>
+                        </h2>
+                        <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Employers can verify your certificate by scanning the QR code or entering the Certificate ID 
+                                on our verification page. The verification shows all certificate details and confirms authenticity.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq4">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                Can I share my certificate on social media?
+                            </button>
+                        </h2>
+                        <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes! After verifying your certificate, you'll get options to share verification links on LinkedIn, 
+                                Twitter, and other platforms. This allows others to verify your achievement directly.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Download Modal -->
+<div class="modal fade" id="downloadModal" tabindex="-1" aria-labelledby="downloadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="downloadModalLabel">
+                    <i class="fas fa-download me-2"></i>Download Certificate
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="downloadForm">
+                    <div class="mb-3">
+                        <label for="download_certificate_id" class="form-label">Certificate ID</label>
+                        <input type="text" class="form-control" id="download_certificate_id" 
+                               placeholder="Enter your Certificate ID" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="download_email" class="form-label">Email (Optional)</label>
+                        <input type="email" class="form-control" id="download_email" 
+                               placeholder="Your email address for verification">
+                        <div class="form-text">
+                            Providing your email helps us verify your identity
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="downloadCertificate()">
+                    <i class="fas fa-download me-1"></i>Download
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Scanner Modal -->
+<div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrScannerModalLabel">
+                    <i class="fas fa-qrcode me-2"></i>QR Code Scanner
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="qr-scanner-container">
+                    <div class="alert alert-info">
+                        <i class="fas fa-camera me-2"></i>
+                        Position your camera so the QR code from your certificate is clearly visible in the frame below.
+                    </div>
+                    <div id="qr-video-container" class="mb-3">
+                        <p class="text-muted">QR scanner would be implemented here using a library like QuaggaJS or ZXing-js</p>
+                        <div class="bg-light border rounded p-5">
+                            <i class="fas fa-camera fa-3x text-muted"></i>
+                            <p class="text-muted mt-2">Camera Preview Area</p>
+                        </div>
+                    </div>
+                    <div id="qr-scan-result" style="display: none;">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            QR Code detected! Redirecting to verification...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-outline-primary" onclick="toggleCamera()">
+                    <i class="fas fa-video me-1"></i>Toggle Camera
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let video = null;
+let canvas = null;
+let canvasContext = null;
+let scanning = false;
+
+function startQRScanner() {
+    const modal = new bootstrap.Modal(document.getElementById('qrScannerModal'));
+    modal.show();
+    
+    // Create video element
+    video = document.createElement('video');
+    video.setAttribute('playsinline', true);
+    video.setAttribute('autoplay', true);
+    
+    // Create canvas element
+    canvas = document.createElement('canvas');
+    canvasContext = canvas.getContext('2d');
+    
+    // Add elements to scanner container
+    const container = document.getElementById('qr-video-container');
+    container.innerHTML = '';
+    container.appendChild(video);
+    container.appendChild(canvas);
+    
+    // Start scanning
+    scanning = true;
+    scanQRCode();
+    
+    // Request camera access
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(function(stream) {
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch(function(err) {
+            console.error('Error accessing camera:', err);
+            container.innerHTML = '<div class="alert alert-danger">Error accessing camera. Please ensure you have granted camera permissions.</div>';
+        });
+}
+
+function scanQRCode() {
+    if (!scanning) return;
+    
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth;
+        canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        
+        if (code) {
+            // Stop scanning
+            scanning = false;
+            
+            // Process the QR code data
+            const qrData = code.data;
+            if (qrData.includes('/qr/')) {
+                const certificateId = qrData.split('/qr/')[1];
+                window.location.href = `/qr/${certificateId}`;
+            } else {
+                alert('Invalid QR code format. Please scan a valid certificate QR code.');
+                scanning = true;
+            }
+        }
+    }
+    
+    // Continue scanning
+    requestAnimationFrame(scanQRCode);
+}
+
+function toggleCamera() {
+    if (video && video.srcObject) {
+        const tracks = video.srcObject.getTracks();
+        tracks.forEach(track => {
+            if (track.kind === 'video') {
+                const currentFacingMode = track.getConstraints().facingMode;
+                const newFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+                track.applyConstraints({ facingMode: newFacingMode });
+            }
+        });
+    }
+}
+
+// Clean up when modal is closed
+document.getElementById('qrScannerModal').addEventListener('hidden.bs.modal', function () {
+    scanning = false;
+    if (video && video.srcObject) {
+        const tracks = video.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+    }
+});
+
+// Certificate lookup form handler
+document.getElementById('certificateLookupForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const certificateId = document.getElementById('student_certificate_id').value.trim();
+    if (certificateId) {
+        // Redirect to verification page with certificate ID
+        window.location.href = `{{ url_for('verify_certificate') }}?certificate_id=${encodeURIComponent(certificateId)}`;
+    }
+});
+
+// Download certificate functionality
+function downloadCertificate() {
+    const certificateId = document.getElementById('download_certificate_id').value.trim();
+    const email = document.getElementById('download_email').value.trim();
+    
+    if (!certificateId) {
+        alert('Please enter your Certificate ID');
+        return;
+    }
+    
+    // First verify the certificate exists
+    fetch(`{{ url_for('verify_certificate') }}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `certificate_id=${encodeURIComponent(certificateId)}`
+    })
+    .then(response => {
+        if (response.ok) {
+            // If verification successful, redirect to download
+            window.open(`{{ url_for('download_certificate', certificate_id='PLACEHOLDER') }}`.replace('PLACEHOLDER', certificateId), '_blank');
+            bootstrap.Modal.getInstance(document.getElementById('downloadModal')).hide();
+        } else {
+            alert('Certificate not found. Please check your Certificate ID.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error verifying certificate. Please try again.');
+    });
+}
+
+// Auto-format certificate ID inputs
+document.addEventListener('DOMContentLoaded', function() {
+    const certInputs = document.querySelectorAll('#student_certificate_id, #download_certificate_id');
+    certInputs.forEach(input => {
+        input.addEventListener('input', function(e) {
+            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+            e.target.value = value;
+        });
+    });
+});
+
+// Social media sharing functions
+function shareOnLinkedIn(certificateId) {
+    const url = `{{ url_for('verify_certificate', _external=True) }}?certificate_id=${certificateId}`;
+    const text = 'I successfully completed my internship program! Verify my certificate here:';
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&summary=${encodeURIComponent(text)}`, '_blank');
+}
+
+function shareOnTwitter(certificateId) {
+    const url = `{{ url_for('verify_certificate', _external=True) }}?certificate_id=${certificateId}`;
+    const text = 'I successfully completed my internship program! Verify my certificate here:';
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+}
+
+// Copy verification link to clipboard
+function copyVerificationLink(certificateId) {
+    const url = `{{ url_for('verify_certificate', _external=True) }}?certificate_id=${certificateId}`;
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Verification link copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+    });
+}
+</script>
+{% endblock %}

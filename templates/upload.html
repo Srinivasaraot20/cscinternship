@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Excel - Certificate Manager{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-upload me-2"></i>Upload Excel File
+                </h4>
+                <p class="mb-0 mt-2 text-muted">Upload student data for bulk certificate generation</p>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-4">
+                        {{ form.file.label(class="form-label") }}
+                        {{ form.file(class="form-control" + (" is-invalid" if form.file.errors else ""), accept=".xlsx,.xls") }}
+                        {% if form.file.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.file.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Only Excel files (.xlsx, .xls) are accepted. Maximum file size: 16MB.
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex">
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Excel Format Guide -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-table me-2"></i>Required Excel Format
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>Required Columns:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success me-1"></i> Student Name</li>
+                    <li><i class="fas fa-check text-success me-1"></i> Roll Number</li>
+                    <li><i class="fas fa-check text-success me-1"></i> Branch</li>
+                    <li><i class="fas fa-check text-success me-1"></i> College Name</li>
+                    <li><i class="fas fa-check text-success me-1"></i> Email</li>
+                    <li><i class="fas fa-check text-success me-1"></i> Internship Name</li>
+                    <li><i class="fas fa-check text-success me-1"></i> Start Date</li>
+                    <li><i class="fas fa-check text-success me-1"></i> End Date</li>
+                </ul>
+                
+                <h6 class="mt-3">Optional Columns:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-plus text-info me-1"></i> Mentor Name</li>
+                    <li><i class="fas fa-plus text-info me-1"></i> Internship Location</li>
+                    <li><i class="fas fa-plus text-info me-1"></i> Performance Grade</li>
+                    <li><i class="fas fa-plus text-info me-1"></i> Specialization</li>
+                </ul>
+                
+                <div class="mt-3">
+                    <button class="btn btn-outline-primary btn-sm" onclick="downloadSample()">
+                        <i class="fas fa-download me-1"></i>Download Sample
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Processing Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-cogs me-2"></i>Processing Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>What happens after upload:</strong></p>
+                <ol class="list-group list-group-numbered">
+                    <li class="list-group-item d-flex align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Data Validation</div>
+                            Excel data is validated and cleaned
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Certificate Generation</div>
+                            PDF certificates are created with QR codes
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Email Distribution</div>
+                            Certificates are sent via email automatically
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Status Tracking</div>
+                            Results are displayed on the dashboard
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Tips -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>Tips for Success
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Ensure all email addresses are valid
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Use consistent date format (DD/MM/YYYY)
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Remove empty rows from Excel file
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Double-check student names for spelling
+                    </li>
+                    <li class="mb-0">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Verify end date is after start date
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Processing Modal -->
+<div class="modal fade" id="processingModal" tabindex="-1" aria-labelledby="processingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="processingModalLabel">
+                    <i class="fas fa-cogs me-2"></i>Processing Excel File
+                </h5>
+            </div>
+            <div class="modal-body text-center">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mb-0">Please wait while we process your Excel file and generate certificates...</p>
+                <p class="text-muted">This may take a few minutes for large files.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function downloadSample() {
+    // Create sample Excel data
+    const sampleData = [
+        ['Student Name', 'Roll Number', 'Branch', 'College Name', 'Email', 'Internship Name', 'Start Date', 'End Date', 'Mentor Name', 'Internship Location', 'Performance Grade', 'Specialization'],
+        ['John Doe', 'CS2021001', 'Computer Science', 'ABC Engineering College', 'john.doe@email.com', 'AI Development', '15/01/2024', '15/04/2024', 'Dr. Smith', 'Tech Corp', 'A', 'Machine Learning'],
+        ['Jane Smith', 'CS2021002', 'Information Technology', 'XYZ Institute of Technology', 'jane.smith@email.com', 'Web Development', '20/01/2024', '20/04/2024', 'Prof. Johnson', 'Innovation Labs', 'A+', 'Full Stack Development']
+    ];
+    
+    // Convert to CSV and download
+    const csvContent = sampleData.map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'certificate_template.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+// Show processing modal on form submit
+document.querySelector('form').addEventListener('submit', function(e) {
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput.files.length > 0) {
+        const modal = new bootstrap.Modal(document.getElementById('processingModal'));
+        modal.show();
+    }
+});
+
+// File input validation
+document.querySelector('input[type="file"]').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const fileSize = file.size / 1024 / 1024; // Convert to MB
+        const maxSize = 16; // 16MB
+        
+        if (fileSize > maxSize) {
+            alert(`File size (${fileSize.toFixed(2)}MB) exceeds maximum allowed size (${maxSize}MB)`);
+            e.target.value = '';
+            return;
+        }
+        
+        const allowedTypes = ['.xlsx', '.xls'];
+        const fileName = file.name.toLowerCase();
+        const isValidType = allowedTypes.some(type => fileName.endsWith(type));
+        
+        if (!isValidType) {
+            alert('Please select a valid Excel file (.xlsx or .xls)');
+            e.target.value = '';
+            return;
+        }
+    }
+});
+</script>
+{% endblock %}

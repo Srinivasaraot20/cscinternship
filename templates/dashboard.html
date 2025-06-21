@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Certificate Manager{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-6">
+            <i class="fas fa-dashboard me-2"></i>Dashboard
+        </h1>
+        <p class="text-muted">Manage and monitor certificate generation and distribution</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-2 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Total Students</h5>
+                        <h2 class="mb-0" id="total-students">{{ stats.total_students }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2 mb-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Pending</h5>
+                        <h2 class="mb-0" id="pending-certs">{{ stats.pending_certs }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Sent</h5>
+                        <h2 class="mb-0" id="sent-certs">{{ stats.sent_certs }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2 mb-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Failed</h5>
+                        <h2 class="mb-0" id="failed-certs">{{ stats.failed_certs }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Verified</h5>
+                        <h2 class="mb-0" id="verified-certs">{{ stats.verified_certs }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-shield-alt fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2 mb-3">
+        <div class="card bg-secondary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Success Rate</h5>
+                        <h2 class="mb-0" id="success-rate">{{ stats.success_rate }}%</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chart-line fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('admin.upload') }}" class="btn btn-primary me-2 mb-2">
+                    <i class="fas fa-upload me-1"></i>Upload Excel File
+                </a>
+                <a href="{{ url_for('admin.students') }}" class="btn btn-outline-primary me-2 mb-2">
+                    <i class="fas fa-list me-1"></i>View All Students
+                </a>
+                <a href="{{ url_for('verify_certificate') }}" class="btn btn-outline-secondary me-2 mb-2">
+                    <i class="fas fa-search me-1"></i>Verify Certificate
+                </a>
+                <button class="btn btn-outline-info mb-2" onclick="refreshStats()">
+                    <i class="fas fa-sync-alt me-1"></i>Refresh Statistics
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts and Analytics -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Certificate Activity (Last 7 Days)
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="activityChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Certificate Status Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2"></i>Recent Students
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_students %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Certificate ID</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in recent_students %}
+                                <tr>
+                                    <td>{{ student.student_name }}</td>
+                                    <td><code>{{ student.certificate_id }}</code></td>
+                                    <td>
+                                        {% if student.certificate_status == 'sent' %}
+                                            <span class="badge bg-success">Sent</span>
+                                        {% elif student.certificate_status == 'failed' %}
+                                            <span class="badge bg-danger">Failed</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ student.created_at.strftime('%m/%d') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center mb-0">No recent students</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-shield-alt me-2"></i>Recent Verifications
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_verifications %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Certificate ID</th>
+                                    <th>Method</th>
+                                    <th>Time</th>
+                                    <th>IP</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for verification in recent_verifications %}
+                                <tr>
+                                    <td><code>{{ verification.certificate_id }}</code></td>
+                                    <td>
+                                        {% if verification.verification_method == 'qr_scan' %}
+                                            <i class="fas fa-qrcode text-primary"></i> QR Scan
+                                        {% else %}
+                                            <i class="fas fa-keyboard text-secondary"></i> Manual
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ verification.verified_at.strftime('%m/%d %H:%M') }}</td>
+                                    <td class="text-muted">{{ verification.ip_address[:8] }}...</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center mb-0">No recent verifications</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-4">
+            <div class="d-grid gap-2">
+                <a href="{{ url_for('admin.upload') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-upload me-2"></i>Upload Excel File
+                </a>
+                <a href="{{ url_for('admin.students') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-users me-2"></i>Manage Students
+                </a>
+
+                <!-- Bulk Actions -->
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('generate_all_certificates') }}" 
+                       class="btn btn-success"
+                       onclick="return confirm('Generate certificates and send emails for all pending students?')">
+                        <i class="fas fa-certificate me-1"></i>Generate All Certificates
+                    </a>
+                    <a href="{{ url_for('send_bulk_emails') }}" 
+                       class="btn btn-warning"
+                       onclick="return confirm('Send emails to all students with pending certificates?')">
+                        <i class="fas fa-envelope-bulk me-1"></i>Send Bulk Emails
+                    </a>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+// Initialize charts
+const chartData = {{ chart_data | tojson | safe }};
+const stats = {{ stats | tojson | safe }};
+
+// Activity Chart
+const activityCtx = document.getElementById('activityChart').getContext('2d');
+new Chart(activityCtx, {
+    type: 'line',
+    data: {
+        labels: chartData.map(d => d.date),
+        datasets: [
+            {
+                label: 'Generated',
+                data: chartData.map(d => d.generated),
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1
+            },
+            {
+                label: 'Sent',
+                data: chartData.map(d => d.sent),
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                tension: 0.1
+            },
+            {
+                label: 'Verified',
+                data: chartData.map(d => d.verified),
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                tension: 0.1
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Status Chart
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Sent', 'Pending', 'Failed', 'Verified'],
+        datasets: [{
+            data: [stats.sent_certs, stats.pending_certs, stats.failed_certs, stats.verified_certs],
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 206, 86, 0.8)',
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(75, 192, 192, 0.8)'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Auto-refresh stats every 30 seconds
+setInterval(refreshStats, 30000);
+</script>
+{% endblock %}
